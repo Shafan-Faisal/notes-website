@@ -1,44 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Notes</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>📚 Notes Hub</title>
+
+  <!-- Google Font (works when online) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      text-align: center;
-      padding: 20px;
+    :root{
+      --bg1: #f6f8fb;
+      --card:#ffffff;
+      --accent:#3b82f6;
+      --muted:#6b7280;
+      --glass: rgba(255,255,255,0.6);
+      --radius:14px;
     }
-    h1 {
-      color: #333;
+
+    /* page texture + gradient */
+    body{
+      margin:0;
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:
+        linear-gradient(135deg,#f7f9fc 0%, #eef3f9 100%),
+        radial-gradient(circle at 10% 10%, rgba(255,255,255,0.6), transparent 10%),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 6px);
+      color: #111827;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      min-height:100vh;
+      padding:28px;
     }
-    .notes {
-      margin: 20px auto;
-      padding: 20px;
-      width: 300px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+    .wrap{
+      max-width:1000px;
+      margin:0 auto;
     }
-    a {
-      display: block;
-      margin: 10px 0;
-      text-decoration: none;
-      color: blue;
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:22px;
     }
-    a:hover {
-      text-decoration: underline;
+
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+
+    .logo{
+      width:56px;
+      height:56px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:12px;
+      background:linear-gradient(135deg,var(--accent), #7c3aed);
+      color:white;
+      font-size:22px;
+      box-shadow:0 6px 18px rgba(59,130,246,0.18);
+    }
+    h1{ font-size:20px; margin:0; }
+    p.lead{ margin:0; color:var(--muted); font-size:13px; }
+
+    /* search + actions */
+    .controls{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .search{
+      background:var(--card);
+      padding:8px 10px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      border-radius:10px;
+      box-shadow:0 3px 10px rgba(16,24,40,0.05);
+      min-width:260px;
+    }
+    .search input{
+      border:0; outline:0; font-size:14px; width:100%;
+      background:transparent;
+    }
+    .btn{
+      background:var(--accent);
+      color:white;
+      border:0;
+      padding:8px 12px;
+      border-radius:10px;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow:0 6px 14px rgba(59,130,246,0.18);
+    }
+    .btn.ghost{
+      background:transparent; color:var(--accent); border:1px solid rgba(59,130,246,0.12);
+      box-shadow:none;
+    }
+
+    /* grid of notes */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
+      gap:16px;
+      margin-top:20px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:12px;
+      padding:14px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      box-shadow: 0 6px 18px rgba(8,15,32,0.06);
+      transition: transform .18s ease, box-shadow .18s ease;
+      text-decoration:none;
+      color:inherit;
+    }
+    .card:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(8,15,32,0.09); }
+
+    .file-icon{
+      min-width:56px;
+      height:56px;
+      border-radius:10px;
+      background:linear-gradient(180deg,#eef2ff,#e6f0ff);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      color:#1e3a8a;
+      font-size:18px;
+      flex-shrink:0;
+    }
+
+    .meta{
+      flex:1;
+      min-width:0;
+    }
+    .meta .title{ font-weight:600; margin:0 0 6px 0; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .meta .desc{ margin:0; color:var(--muted); font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+    .actions{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .download{
+      font-weight:600;
+      font-size:13px;
+      padding:8px 10px;
+      border-radius:10px;
+      background:linear-gradient(180deg,var(--accent), #2563eb);
+      color:white;
+      text-decoration:none;
+      display:inline-block;
+    }
+    .small{ font-size:12px; color:var(--muted); }
+
+    /* footer */
+    footer{ margin-top:30px; color:var(--muted); font-size:13px; text-align:center; }
+
+    /* responsive */
+    @media (max-width:520px){
+      .controls{ width:100%; justify-content:space-between; }
+      .search{ min-width:120px; flex:1; }
     }
   </style>
 </head>
 <body>
-  <h1>?? My Notes Collection</h1>
-  <p>Click below to download notes:</p>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">📚</div>
+        <div>
+          <h1>Notes Hub</h1>
+          <p class="lead">Easy downloads for your class — updated by you</p>
+        </div>
+      </div>
 
-  <div class="notes">
-    <a href="notes1.pdf" download>Download Phsics Notes (PDF)</a>
-   
+      <div class="controls">
+        <div class="search" role="search" aria-label="Search notes">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:.6"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <input id="searchInput" placeholder="Search notes by title (e.g. chapter 1)" />
+        </div>
+
+        <a class="btn ghost" href="https://github.com/" target="_blank" rel="noopener">Manage on GitHub</a>
+        <button class="btn" onclick="location.href='#notes'">View Notes</button>
+      </div>
+    </header>
+
+    <!-- Notes grid: replace the sample cards with your own file names -->
+    <main id="notes">
+      <div class="grid" id="notesGrid">
+
+        <!-- Sample card 1 -->
+        <a class="card" href="notes1.pdf" download data-title="Physics Notes" data-tags="chapter1-10, AKUEB">
+          <div class="file-icon">PDF</div>
+          <div class="meta">
+            <div class="title">Phyics - Notes</div>
+            <div class="desc">Chapter 1 — 10</div>
+          </div>
+          <div class="actions">
+            <div class="small">PDF • 1.2MB</div>
+            <a class="download" href="notes1.pdf" download>Download</a>
+          </div>
+        </a>
+
+
+        <!-- Duplicate and edit the card block above to add more notes -->
+      </div>
+    </main>
+
+    <footer>
+      Tip: To add new files, upload them to your GitHub repo (same folder as this file) and then add a new card here with the filename.
+    </footer>
   </div>
+
+  <script>
+    // simple client-side search for cards
+    const input = document.getElementById('searchInput');
+    const grid = document.getElementById('notesGrid');
+    const cards = Array.from(grid.querySelectorAll('.card'));
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      cards.forEach(c => {
+        const title = (c.dataset.title || c.querySelector('.title').textContent).toLowerCase();
+        const tags = (c.dataset.tags || '').toLowerCase();
+        const show = title.includes(q) || tags.includes(q);
+        c.style.display = show ? '' : 'none';
+      });
+    });
+
+    // small progressive enhancement: if card link has no file, mark it
+    cards.forEach(c => {
+      const a = c.getAttribute('href');
+      if(!a || a.trim()==='#') c.style.opacity = '0.6';
+    });
+  </script>
 </body>
 </html>
